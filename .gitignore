@@ -12,7 +12,9 @@ __pycache__/
 # Archivos de log
 *.log
 
-# Generated files - IMPORTANTE: Archivos generados por el proyecto
-generated_files/
-databridge_config_files/
+# Generated files
 *.json
+
+# Keep placeholder files for empty dirs tracked by git
+!databridge_config_files/.gitkeep
+!logs/.gitkeep
