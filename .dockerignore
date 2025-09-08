@@ -66,6 +66,10 @@ robot-data/
 kafka-submodel-consumer/
 basyx/
 
+# Explicitly include files from robot-data needed in image build
+!robot-data/app_realtime.py
+!robot-data/joints.txt
+
 # Temporary files
 *.tmp
 *.temp
