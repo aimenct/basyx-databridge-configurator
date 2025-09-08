@@ -1,0 +1,241 @@
+
+services:
+  databridge:
+    image: eclipsebasyx/databridge:1.0.0-SNAPSHOT
+    container_name: databridge
+    volumes:
+      # Mount the generated configuration files
+      - ./databridge_config_files:/usr/share/config
+    depends_on:
+      aas-env:
+        condition: service_healthy
+      kafka-broker:
+        condition: service_healthy
+      databridge-configurator:
+        condition: service_completed_successfully
+    restart: always
+    networks:
+      - databridge-network
+  databridge-configurator:
+    image: ghcr.io/aimenct/basyx-databridge-configurator/basyx-databridge-configurator-python:latest
+    container_name: basyx-databridge-configurator
+    environment:
+      # Override these in your .env file or docker-compose.override.yml
+      - BASE_URL=${BASE_URL:-http://aas-env:8081}
+      - DATABRIDGE_ID=${DATABRIDGE_ID:-aHR0cHM6Ly93d3cuYWltZW4uZXMvc20vYWlkL3h4bGlwaWxvdGZhY3RvcnkvZGF0YWJyaWRnZQ==}
+      - DATABRIDGE_ID_AID=${DATABRIDGE_ID_AID:-aHR0cHM6Ly93d3cuYWltZW4uZXMvc20vYWlkL3h4bGlwaWxvdGZhY3RvcnkvZGF0YWJyaWRnZQ==}
+      - DATABRIDGE_ID_AIMC=${DATABRIDGE_ID_AIMC:-aHR0cHM6Ly93d3cuYWltZW4uZXMvc20vYWltYy94eGxpcGlsb3RmYWN0b3J5L2RhdGFicmlkZ2U=}
+    volumes:
+      # Mount .env file for configuration
+      - ./.env:/app/.env:ro
+      # Mount generated files directory to host
+      - ./databridge_config_files:/app/databridge_config_files
+      # Mount logs directory
+      - ./logs:/app/logs
+    networks:
+      - databridge-network
+    restart: on-failure
+    depends_on:
+      aas-env:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "test", "-f", "/app/databridge_config_files/routes.json"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  aas-env:
+    image: eclipsebasyx/aas-environment:2.0.0-SNAPSHOT
+    environment:
+      - SERVER_PORT=8081
+    volumes:
+      - ./aas:/application/aas
+      - ./basyx/aas-env.properties:/application/application.properties
+    ports:
+      - '8081:8081'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: always
+    networks:
+      - databridge-network
+    depends_on:
+      kafka-broker:
+        condition: service_healthy
+      aas-registry:
+        condition: service_healthy
+      sm-registry:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+
+  kafka-broker:
+    image: apache/kafka:4.0.0
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+      - "29092:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka-broker:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-broker:9093'
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_NUM_PARTITIONS: 3
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - databridge-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  aas-registry:
+    image: eclipsebasyx/aas-registry-log-mongodb:2.0.0-SNAPSHOT
+    ports:
+      - '8082:8080'
+    environment:
+      - SERVER_PORT=8080
+    volumes:
+      - ./basyx/aas-registry.yml:/workspace/config/application.yml
+    restart: always
+    networks:
+      - databridge-network
+    depends_on:
+      mongo:
+        condition: service_healthy
+  sm-registry:
+    image: eclipsebasyx/submodel-registry-log-mongodb:2.0.0-SNAPSHOT
+    ports:
+      - '8083:8080'
+    environment:
+      - SERVER_PORT=8080
+    volumes:
+      - ./basyx/sm-registry.yml:/workspace/config/application.yml
+    restart: always
+    networks:
+      - databridge-network
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # Optional: Kafka UI for easier management
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    depends_on:
+      kafka-broker:
+        condition: service_healthy
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: DIM_Cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker:29092
+      KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: PLAINTEXT
+    restart: always
+    networks:
+      - databridge-network
+
+  # Robot Data Generator - generates robot data from joints.txt with real-time simulation
+  robot-data-generator:
+    image: ghcr.io/aimenct/basyx-databridge-configurator/robot-data:latest
+    environment:
+      - KAFKA_BROKER=kafka-broker:29092
+      - PUBLISH_INTERVAL=0.1
+      - TOPIC_JOINT_STATES=MPCM.joint_tool_states
+      - JOINTS_FILE=/app/joints.txt
+      - REAL_TIME_MODE=true
+      - ROBOT_CYCLE_TIME=0.004
+    depends_on:
+      kafka-broker:
+        condition: service_healthy
+
+    restart: always
+    networks:
+      - databridge-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('kafka-broker', 29092), timeout=5)"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  #     start_period: 30s
+
+  aas-web-ui:
+    image: eclipsebasyx/aas-gui:SNAPSHOT
+    ports:
+      - '3000:3000'
+    environment:
+      AAS_REGISTRY_PATH: http://localhost:8082/shell-descriptors
+      SUBMODEL_REGISTRY_PATH: http://localhost:8083/submodel-descriptors
+      AAS_REPO_PATH: http://localhost:8081/shells
+      SUBMODEL_REPO_PATH: http://localhost:8081/submodels
+      CD_REPO_PATH: http://localhost:8081/concept-descriptions
+      LOGO_PATH: Aimen.png
+      PRIMARY_COLOR: '#0094FF'
+    restart: always
+    depends_on:
+      aas-env:
+        condition: service_healthy
+    volumes:
+      - ./basyx/logo:/usr/src/app/dist/Logo
+
+  # Kafka Submodel Events Consumer - listens for submodel events and logs them
+  kafka-submodel-consumer:
+    image: ghcr.io/aimenct/basyx-databridge-configurator/kafka-submodel-consumer:latest
+    environment:
+      - KAFKA_BROKERS=kafka-broker:29092
+      - KAFKA_SUBMODEL_TOPIC=submodel-events
+      - KAFKA_CONSUMER_GROUP=databridge-monitor-group
+    volumes:
+      # Mount logs directory
+      - ./logs:/app/logs
+      # Mount docker-compose.yml for container recreation
+      - ./docker-compose.yml:/app/docker-compose.yml
+      # Mount docker socket for docker commands
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      kafka-broker:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - databridge-network
+
+  mongo:
+    image: mongo:5.0.10
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoAdmin
+      MONGO_INITDB_ROOT_PASSWORD: mongoPassword
+    restart: unless-stopped
+    networks:
+      - databridge-network
+    healthcheck:
+      test: mongo
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  databridge-network:
+    driver: bridge
+    name: databridge-network
+
+volumes:
+  kafka_data:
+    driver: local

@@ -11,7 +11,20 @@ furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
+Conditions
 
+1. Preserve notices
+   - Redistributions of the Software (source or binary) must retain all original copyright notices and license notices from this project and third‑party components.
+   - Include the accompanying `NOTICE` file (or equivalent) listing third‑party dependencies and their licenses.
+
+2. Apache‑2.0 components
+   - If you modify source code licensed under Apache License 2.0 included in this distribution, you must preserve Apache headers and add a short note in each modified file, e.g.:
+     "MODIFIED by [NAME] on [DATE]: brief description of change."
+   - Continue to comply with all Apache‑2.0 requirements (including supplying the Apache license text where required).
+
+3. Eclipse components
+   - For components from the Eclipse ecosystem (e.g., Eclipse BaSyx), provide instructions in `NOTICE` on how to obtain the original source (project URL and commit/tag). If you distribute modified Eclipse components, either include the modified sources in your distribution (e.g., in `sources/`) or publish them in a public repository and list the URL + commit/tag in `NOTICE`.
+   
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE

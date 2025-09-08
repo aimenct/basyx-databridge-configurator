@@ -1,0 +1,31 @@
+NOTICE - Third Party Dependencies
+
+Project: basyx-databridge-configurator
+Copyright (c) 2025 AIMEN
+
+Python Dependencies:
+- loguru 0.7.3 (MIT License)
+- python-dotenv 0.9.9 (MIT License) 
+- pydantic 2.10.6 (MIT License)
+- requests 2.32.3 (Apache-2.0 License)
+
+Container Images:
+- MongoDB (Server Side Public License - SSPL)
+- Apache Kafka (Apache-2.0 License)
+
+When using Docker images from this project, please reference:
+- Source: https://github.com/aimenct/basyx-databridge-configurator
+- Copyright (c) 2025 AIMEN
+
+Eclipse BaSyx Components:
+- Eclipse BaSyx Databridge (Eclipse Public License)
+- Eclipse BaSyx AAS Web UI (Eclipse Public License)  
+- Eclipse BaSyx Java Server SDK (Eclipse Public License)
+
+This project source code is available at: https://github.com/aimenct/basyx-databridge-configurator
+
+Source code for all third-party dependencies is available from their respective official repositories:
+- Python packages: https://pypi.org/
+- Eclipse BaSyx components: https://github.com/eclipse-basyx/
+
+No modifications have been made to any third-party components.

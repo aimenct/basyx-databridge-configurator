@@ -1,0 +1,18 @@
+# Entorno virtual
+.venv/
+
+# Configuración de Visual Studio Code
+.vscode/
+
+# Archivos de caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de log
+*.log
+
+# Generated files - IMPORTANTE: Archivos generados por el proyecto
+generated_files/
+databridge_config_files/
+*.json
