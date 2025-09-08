@@ -66,6 +66,7 @@ This Docker Compose setup includes a complete Industry 4.0 data integration stac
 | **databridge** | 🔄 Data Bridge | - | BaSyx DataBridge service that consumes Kafka data and updates AAS properties |
 | **aas-web-ui** | 🖥️ Web Interface | 3000 | BaSyx AAS Web UI for monitoring and managing Asset Administration Shells |
 | **robot-data** | 🤖 Robot Simulator | - | Publishes realistic robot joint state data to Kafka topic `MPCM.joint_tool_states` |
+| **kafka-ui** | 🧭 Kafka UI | 8090 | Web UI for Kafka clusters (optional) |
 
 
 ### 🔄 Service Interaction Flow
@@ -89,6 +90,20 @@ docker-compose ps
 docker-compose logs -f databridge-configurator
 docker-compose logs -f robot-data-generator
 ```
+
+### ✅ Verification
+
+1. Verify robot data in Kafka UI
+   - Open Kafka UI: http://localhost:8090
+   - Go to Topics → search for `MPCM.joint_tool_states`.
+   - Open the topic and view/consume messages. You should see JSON messages being published by the robot simulator.
+
+2. Verify live data in BaSyx AAS Web UI
+   - Open BaSyx AAS Web UI: http://localhost:3000
+   - Locate the **Robot** AAS and open **Operational Data** submodel/properties view.
+   - Enable synchronization or start the DataBridge sync for the Robot AAS (toggle/button labelled "Auto sync").
+   - Observe the AAS properties update in real time as messages arrive on the Kafka topic.
+
 
 ## ⚙️ Configuration
 
