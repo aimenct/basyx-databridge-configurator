@@ -162,11 +162,10 @@ services:
       - TOPIC_JOINT_STATES=MPCM.joint_tool_states
       - JOINTS_FILE=/app/joints.txt
       - REAL_TIME_MODE=true
-      - ROBOT_CYCLE_TIME=0.004
+      - ROBOT_CYCLE_TIME=0.004:
     depends_on:
-      kafka-broker:
+      aas-env:
         condition: service_healthy
-
     restart: always
     networks:
       - databridge-network
