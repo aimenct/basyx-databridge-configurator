@@ -101,7 +101,7 @@ docker-compose logs -f robot-data-generator
 2. Verify live data in BaSyx AAS Web UI
    - Open BaSyx AAS Web UI: http://localhost:3000
    - Locate the **Robot** AAS and open **Operational Data** submodel/properties view.
-   - Enable synchronization or start the DataBridge sync for the Robot AAS (toggle/button labelled "Auto sync").
+   - Enable synchronization for the Robot AAS (toggle top right button labelled "Auto sync").
    - Observe the AAS properties update in real time as messages arrive on the Kafka topic.
 
 
