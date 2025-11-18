@@ -1,31 +1,31 @@
-NOTICE - Third Party Dependencies
+Copyright (C) 2025 AIMEN. All rights reserved.
 
-Project: basyx-databridge-configurator
-Copyright (c) 2025 AIMEN
+The Software BASYX_DATABRIDGE_CONFIGURATOR has been developed by the ASOCIACION DE INVESTIGACION METALÚRGICA DEL NOROESTE organization (hereafter AIMEN) within the CONVERGING project under the grant agreement 101058521, funded by the European Union.
 
-Python Dependencies:
-- loguru 0.7.3 (MIT License)
-- python-dotenv 0.9.9 (MIT License) 
-- pydantic 2.10.6 (MIT License)
-- requests 2.32.3 (Apache-2.0 License)
+Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or HADEA. Neither the European Union nor the granting authority can be held responsible for them.
 
-Container Images:
-- MongoDB (Server Side Public License - SSPL)
-- Apache Kafka (Apache-2.0 License)
+This software includes third-party components licensed under various open-source licenses. The following notices are provided in compliance with those licenses:
 
-When using Docker images from this project, please reference:
-- Source: https://github.com/aimenct/basyx-databridge-configurator
-- Copyright (c) 2025 AIMEN
+---
 
-Eclipse BaSyx Components:
-- Eclipse BaSyx Databridge (Eclipse Public License)
-- Eclipse BaSyx AAS Web UI (Eclipse Public License)  
-- Eclipse BaSyx Java Server SDK (Eclipse Public License)
+PyECMA376-2
+-----------
+A Python implementation of the Open Packaging Conventions (OPC) Copyright 2020-2022 by Michael Thies
 
-This project source code is available at: https://github.com/aimenct/basyx-databridge-configurator
+This product includes software developed at Chair of Information and Automation Systems for Process and Material Technology, RWTH Aachen University (https://www.plt.rwth-aachen.de/).
 
-Source code for all third-party dependencies is available from their respective official repositories:
-- Python packages: https://pypi.org/
-- Eclipse BaSyx components: https://github.com/eclipse-basyx/
+----------------------------------------------------------------------
+Requests
+--------
+Copyright 2019 Kenneth Reitz
 
-No modifications have been made to any third-party components.
+----------------------------------------------------------------------
+Apache HttpComponents Client
+----------------------------
+Copyright 1999-2025 The Apache Software Foundation
+
+This product includes software developed at The Apache Software Foundation (http://www.apache.org/).
+
+This product includes a copy of effective_tld_names.dat from https://publicsuffix.org/list/effective_tld_names.dat (see httpclient5/src/test/resources/org/publicsuffix/list/effective_tld_names.dat)
+
+This Source Code Form is subject to the terms of the Mozilla Public License v2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/
